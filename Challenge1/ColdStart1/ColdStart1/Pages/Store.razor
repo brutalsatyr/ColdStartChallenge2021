@@ -1,8 +1,33 @@
 ﻿@page "/store"
+@using ColdStart1App.Shared
+@inject HttpClient Http
 
 <h1>Store</h1>
 
+@if (catalog != null && catalog.icecreams != null && catalog.icecreams.Any())
+{
+
+    @foreach (var catalogItem in catalog.icecreams)
+    {
+        <h2>@catalogItem.Name</h2>
+    }
+
+}
 
 @code {
+    private Catalog catalog;
 
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            catalog = await Http.GetFromJsonAsync<Catalog>("/api/catalogItems");
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.ToString());
+            catalog = new Catalog();
+        }
+    }
 }
