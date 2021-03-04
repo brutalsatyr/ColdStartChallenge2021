@@ -11,7 +11,8 @@
       "allowedRoles": [ "authenticated" ]
     },
     {
-      "route": "/api/catalogItems"
+      "route": "/api/catalogItems",
+      "allowedRoles": [ "authenticated" ]
     },
     {
       "route": "/*",
