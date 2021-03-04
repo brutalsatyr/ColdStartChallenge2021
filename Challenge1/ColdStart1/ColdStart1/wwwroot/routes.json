@@ -2,7 +2,7 @@
   "routes": [
     {
       "route": "/login",
-      "serve": "/.auth/login/github?post_login_redirect_uri=/index.html",
+      "serve": "/.auth/login/github",
       "allowedRoles": [ "anonymous" ]
     },
     {
