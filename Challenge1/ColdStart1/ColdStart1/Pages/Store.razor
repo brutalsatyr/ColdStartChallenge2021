@@ -37,9 +37,16 @@
 
     }
 
-    @if (ErrorMessage != null)
+    @if (string.IsNullOrWhiteSpace(ErrorMessage))
     {
         <h5 style="color:red">
+            @ErrorMessage
+        </h5>
+    }
+
+    @if (string.IsNullOrWhiteSpace(SuccessMessage))
+    {
+        <h5 style="color:green">
             @ErrorMessage
         </h5>
     }
@@ -47,6 +54,7 @@
 @code {
     private Catalog catalog;
     private string ErrorMessage = "";
+    private string SuccessMessage = "";
 
     protected override async Task OnInitializedAsync()
     {
@@ -76,23 +84,23 @@
                     UserDetails = "TestUser"
                 };
             }
+            ErrorMessage = "";
+            SuccessMessage = "";
+
 
 
             if (user != null)
             {
                 Console.WriteLine($"user:  {user.UserDetails}, icecreamid:{icecreamId}");
-                var envVariable = Environment.GetEnvironmentVariable("AzureQueueStorage", EnvironmentVariableTarget.Process);
-                Console.WriteLine($"Sending to {envVariable}");
-
-                foreach(System.Collections.DictionaryEntry env in Environment.GetEnvironmentVariables(EnvironmentVariableTarget.Process))
-                {
-                    Console.Write($"key: {env.Key}. Value: {env.Value}");
-                }
                 var preOrder = new Preorder(user.UserDetails, icecreamId);
                 var response = await Http.PostAsJsonAsync("/api/SendIceCreamOrders", preOrder);
                 if (!response.IsSuccessStatusCode)
                 {
                     ErrorMessage = "The preorder was not successfull";
+                }
+                else
+                {
+                    SuccessMessage = "Preorder has been sent";
                 }
             }
             else
