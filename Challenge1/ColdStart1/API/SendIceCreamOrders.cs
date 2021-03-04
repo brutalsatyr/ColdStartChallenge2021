@@ -29,7 +29,7 @@ namespace API
                     requestBody = await sReader.ReadToEndAsync();
                 }
 
-                var connectionString = Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING", EnvironmentVariableTarget.Process);
+                var connectionString = Environment.GetEnvironmentVariable("AzureQueueStorage", EnvironmentVariableTarget.Process);
                 var queueClient = new QueueClient(connectionString, QueueName);
                 await queueClient.SendMessageAsync(requestBody);
                 //Send to AzureQueue Storage

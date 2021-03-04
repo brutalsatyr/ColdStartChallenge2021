@@ -83,6 +83,11 @@
                 Console.WriteLine($"user:  {user.UserDetails}, icecreamid:{icecreamId}");
                 var envVariable = Environment.GetEnvironmentVariable("AzureQueueStorage", EnvironmentVariableTarget.Process);
                 Console.WriteLine($"Sending to {envVariable}");
+
+                foreach(System.Collections.DictionaryEntry env in Environment.GetEnvironmentVariables(EnvironmentVariableTarget.Process))
+                {
+                    Console.Write($"key: {env.Key}. Value: {env.Value}");
+                }
                 var preOrder = new Preorder(user.UserDetails, icecreamId);
                 var response = await Http.PostAsJsonAsync("/api/SendIceCreamOrders", preOrder);
                 if (!response.IsSuccessStatusCode)
