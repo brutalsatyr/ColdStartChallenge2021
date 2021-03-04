@@ -16,13 +16,14 @@
                     <MudText Typo="Typo.h5">@catalogItem.Name</MudText>
                     <MudText Typo="Typo.body2">@catalogItem.Description</MudText>
                 </MudCardContent>
+                <MudCardActions>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Style="align-self:center">Order</MudButton>
+                </MudCardActions>
             </MudCard>
         }
-
     }
     else
     {
-
         <MudCard>
             <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="100px" />
             <MudCardContent>
@@ -32,9 +33,16 @@
         </MudCard>
 
     }
+
+    @if(ErrorMessage != null){
+        <h5 style="color:red">
+            @ErrorMessage
+        </h5>
+    }
 </div>
 @code {
     private Catalog catalog;
+    private string ErrorMessage="";
 
     protected override async Task OnInitializedAsync()
     {
@@ -46,7 +54,7 @@
         catch (Exception ex)
         {
             Console.WriteLine(ex.ToString());
-            catalog = new Catalog();
+            ErrorMessage= $"An error happened when retrieving the catalog {ex.Message}";
         }
     }
 }
