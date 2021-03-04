@@ -37,19 +37,14 @@
 
     }
 
-    @if (string.IsNullOrWhiteSpace(ErrorMessage))
-    {
         <h5 style="color:red">
             @ErrorMessage
         </h5>
-    }
 
-    @if (string.IsNullOrWhiteSpace(SuccessMessage))
-    {
         <h5 style="color:green">
-            @ErrorMessage
+            @SuccessMessage
         </h5>
-    }
+
 </div>
 @code {
     private Catalog catalog;
@@ -100,7 +95,7 @@
                 }
                 else
                 {
-                    SuccessMessage = "Preorder has been sent";
+                    SuccessMessage = $"Preorder of {catalog.icecreams.FirstOrDefault(x=>x.Id== icecreamId).Name} has been sent";
                 }
             }
             else
