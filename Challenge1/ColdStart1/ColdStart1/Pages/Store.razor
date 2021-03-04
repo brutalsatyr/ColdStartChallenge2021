@@ -1,6 +1,7 @@
 ﻿@page "/store"
 @using ColdStart1App.Shared
 @inject HttpClient Http
+@inject IJSRuntime JS;
 
 <h1>Store</h1>
 
@@ -17,7 +18,7 @@
                     <MudText Typo="Typo.body2">@catalogItem.Description</MudText>
                 </MudCardContent>
                 <MudCardActions>
-                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Style="align-self:center">Order</MudButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Style="align-self:center" @onclick="()=> PreOrderIceCream(catalogItem.Id)">Pre-Order</MudButton>
                 </MudCardActions>
             </MudCard>
         }
@@ -34,7 +35,8 @@
 
     }
 
-    @if(ErrorMessage != null){
+    @if (ErrorMessage != null)
+    {
         <h5 style="color:red">
             @ErrorMessage
         </h5>
@@ -42,19 +44,44 @@
 </div>
 @code {
     private Catalog catalog;
-    private string ErrorMessage="";
+    private string ErrorMessage = "";
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            catalog = await Http.GetFromJsonAsync<Catalog>("/api/catalogItems");
+            catalog = await Http.GetFromJsonAsync<Catalog>("/api/CatalogItems");
 
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex.ToString());
-            ErrorMessage= $"An error happened when retrieving the catalog {ex.Message}";
+            ErrorMessage = $"An error happened when retrieving the catalog {ex.Message}";
+        }
+    }
+
+    private async Task PreOrderIceCream(int icecreamId)
+    {
+
+        try
+        {
+            var user =  await JS.InvokeAsync<ClientPrincipal>("getUserInfo");
+            if (user != null)
+            {
+
+                var preOrder = new Preorder(user.UserDetails, icecreamId);
+                await Http.PostAsJsonAsync("/api/SendIceCreamOrders", preOrder);
+            }
+            else
+            {
+                throw new Exception("If the user is not logged in, you cannot preorder the icecream");
+            }
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.ToString());
+            ErrorMessage = $"An error happened when preordering the icecream: {ex.Message}";
         }
     }
 }

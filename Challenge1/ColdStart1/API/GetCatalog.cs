@@ -15,7 +15,7 @@ namespace API
 {
     public static class GetCatalog
     {
-        [FunctionName("catalogItems")]
+        [FunctionName("CatalogItems")]
         public static IActionResult Run([HttpTrigger(AuthorizationLevel.Anonymous,"get",Route = null)] HttpRequest req, ILogger log)
         {
             var binDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
