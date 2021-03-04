@@ -1,19 +1,46 @@
 ﻿@inherits LayoutComponentBase
+@inject IJSRuntime JS;
+@using ColdStart1App.Shared
 
-    <MudThemeProvider />
-    <MudDialogProvider />
-    <MudSnackbarProvider />
+<MudThemeProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
 
-    <div class="sidebar">
-        <NavMenu />
+<div class="sidebar">
+    <NavMenu />
+</div>
+
+<div class="main">
+    <div class="top-row px-4">
+        @if (ClientPrincipal == null)
+        {
+            <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Color="Color.Primary" Link="/login" />
+        }
+        else
+        {
+            <p>>Welcome @ClientPrincipal.UserId</p>
+        }
     </div>
 
-    <div class="main">
-        <div class="top-row px-4">
-            <a href="http://blazor.net" target="_blank" class="ml-md-auto">About</a>
-        </div>
-
-        <div class="content px-4">
-            @Body
-        </div>
+    <div class="content px-4">
+        @Body
     </div>
+</div>
+
+@code{
+
+    private ClientPrincipal ClientPrincipal;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            ClientPrincipal = await JS.InvokeAsync<ClientPrincipal>("getUserInfo");
+        }
+        catch(Exception ex)
+        {
+            Console.WriteLine(ex.ToString());
+        }
+    }
+
+}

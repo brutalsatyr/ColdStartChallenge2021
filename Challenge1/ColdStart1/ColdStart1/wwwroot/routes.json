@@ -1,6 +1,19 @@
 {
   "routes": [
     {
+      "route": "/login",
+      "serve": "/.auth/login/github?post_login_redirect_uri=/index.html",
+      "allowedRoles": [ "anonymous" ]
+    },
+    {
+      "route": "/logout",
+      "serve": "/.auth/logout",
+      "allowedRoles": [ "authenticated" ]
+    },
+    {
+      "route": "/api/catalogItems"
+    },
+    {
       "route": "/*",
       "serve": "/index.html",
       "statusCode": 200
