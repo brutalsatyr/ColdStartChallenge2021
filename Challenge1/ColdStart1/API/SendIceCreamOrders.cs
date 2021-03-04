@@ -1,6 +1,8 @@
 using System;
+using System.Configuration;
 using System.IO;
 using System.Threading.Tasks;
+using Azure.Storage.Queues;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
@@ -12,17 +14,24 @@ namespace API
 {
     public static class SendIceCreamOrders
     {
+       
+        public static string QueueName = "icecreamorders";
+
         [FunctionName("SendIceCreamOrders")]
         public static async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req, ILogger log)
         {
             try
             {
+                
                 string requestBody = String.Empty;
                 using (StreamReader sReader = new StreamReader(req.Body))
                 {
-                    var body = await sReader.ReadToEndAsync();
+                    requestBody = await sReader.ReadToEndAsync();
                 }
 
+                var connectionString = Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING", EnvironmentVariableTarget.Process);
+                var queueClient = new QueueClient(connectionString, QueueName);
+                await queueClient.SendMessageAsync(requestBody);
                 //Send to AzureQueue Storage
                 Console.WriteLine(requestBody);
 

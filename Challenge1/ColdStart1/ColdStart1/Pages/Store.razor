@@ -1,7 +1,9 @@
 ﻿@page "/store"
 @using ColdStart1App.Shared
+@using Microsoft.AspNetCore.Components.WebAssembly.Hosting
 @inject HttpClient Http
 @inject IJSRuntime JS;
+@inject IWebAssemblyHostEnvironment HostEnvironment
 
 <h1>Store</h1>
 
@@ -65,10 +67,20 @@
 
         try
         {
-            var user =  await JS.InvokeAsync<ClientPrincipal>("getUserInfo");
+            var user = await JS.InvokeAsync<ClientPrincipal>("getUserInfo");
+
+            if (HostEnvironment.IsDevelopment())
+            {
+                user = new ClientPrincipal
+                {
+                    UserDetails = "TestUser"
+                };
+            }
+
+
             if (user != null)
             {
-
+                Console.WriteLine($"user:  {user.UserDetails}, icecreamid:{icecreamId}");
                 var preOrder = new Preorder(user.UserDetails, icecreamId);
                 await Http.PostAsJsonAsync("/api/SendIceCreamOrders", preOrder);
             }
