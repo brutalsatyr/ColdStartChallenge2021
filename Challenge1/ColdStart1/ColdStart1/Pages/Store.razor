@@ -81,7 +81,8 @@
             if (user != null)
             {
                 Console.WriteLine($"user:  {user.UserDetails}, icecreamid:{icecreamId}");
-                Console.WriteLine(Environment.GetEnvironmentVariable("AzureQueueStorage", EnvironmentVariableTarget.Process);)
+                var envVariable = Environment.GetEnvironmentVariable("AzureQueueStorage", EnvironmentVariableTarget.Process);
+                Console.WriteLine($"Sending to {envVariable}");
                 var preOrder = new Preorder(user.UserDetails, icecreamId);
                 var response = await Http.PostAsJsonAsync("/api/SendIceCreamOrders", preOrder);
                 if (!response.IsSuccessStatusCode)
