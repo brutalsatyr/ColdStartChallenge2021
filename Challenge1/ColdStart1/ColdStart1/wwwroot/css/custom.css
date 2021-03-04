@@ -1,0 +1,10 @@
+﻿.mud-card-media {
+    background-size: contain;
+}
+
+.mud-paper {
+    margin: 5px;
+    max-width:250px;
+    display:inline-block;
+    align-content:center
+}

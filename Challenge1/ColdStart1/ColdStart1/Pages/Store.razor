@@ -4,16 +4,35 @@
 
 <h1>Store</h1>
 
-@if (catalog != null && catalog.icecreams != null && catalog.icecreams.Any())
-{
-
-    @foreach (var catalogItem in catalog.icecreams)
+<div style="text-align:center">
+    @if (catalog != null && catalog.icecreams != null && catalog.icecreams.Any())
     {
-        <h2>@catalogItem.Name</h2>
+
+        @foreach (var catalogItem in catalog.icecreams)
+        {
+            <MudCard>
+                <MudCardMedia Height="100" Image="@catalogItem.ImageUrl" />
+                <MudCardContent>
+                    <MudText Typo="Typo.h5">@catalogItem.Name</MudText>
+                    <MudText Typo="Typo.body2">@catalogItem.Description</MudText>
+                </MudCardContent>
+            </MudCard>
+        }
+
     }
+    else
+    {
 
-}
+        <MudCard>
+            <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="100px" />
+            <MudCardContent>
+                <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="30px" Height="41px" />
+                <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" />
+            </MudCardContent>
+        </MudCard>
 
+    }
+</div>
 @code {
     private Catalog catalog;
 
