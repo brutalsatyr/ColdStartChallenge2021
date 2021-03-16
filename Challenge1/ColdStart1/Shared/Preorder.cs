@@ -6,10 +6,12 @@ namespace ColdStart1App.Shared
 {
     public class Preorder
     {
+        public Preorder()
+        {
 
+        }
         public Preorder(string user, int iceCreamId)
         {
-            Id = Guid.NewGuid();
             Date = DateTime.Now;
             Status = "New";
             User = user;
@@ -22,9 +24,12 @@ namespace ColdStart1App.Shared
         public DateTime Date { get; set; }
         public int IcecreamId { get; set; }
         public string Status { get; set; }
-        public string DriverId { get; set; }
+        public int? DriverId { get; set; }
         public string FullAddress { get; set; }
         public string LastPosition { get; set; }
+
+        public CatalogItem Icecream { get; set; }
+        public Driver Driver { get; set; }
 
     }
 }
