@@ -1,7 +1,0 @@
-{
-	"name": "csv_to_sql",
-	"properties": {
-		"concurrency": 1,
-		"annotations": []
-	}
-}
