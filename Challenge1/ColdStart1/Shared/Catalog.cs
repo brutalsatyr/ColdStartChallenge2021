@@ -12,5 +12,6 @@ namespace ColdStart1App.Shared
         }
 
         public List<CatalogItem> icecreams { get; set; }
+
     }
 }

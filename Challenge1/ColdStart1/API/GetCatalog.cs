@@ -7,6 +7,8 @@ using Api.Data;
 using ColdStart1App.Shared;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.CognitiveServices.Personalizer;
+using Microsoft.Azure.CognitiveServices.Personalizer.Models;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
@@ -31,7 +33,6 @@ namespace API
                 {
                     catalog.icecreams = await context.Icecreams.ToListAsync();
                 }
-
                 return new OkObjectResult(catalog);
             }
             catch (Exception ex)
@@ -40,5 +41,6 @@ namespace API
                 return new BadRequestObjectResult(ex);
             }
         }
+
     }
 }

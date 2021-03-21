@@ -8,19 +8,37 @@
 <h1>Store</h1>
 
 <div style="text-align:center">
-    @if (catalog != null && catalog.icecreams != null && catalog.icecreams.Any())
+    @if (Catalog != null && Catalog.icecreams != null && Catalog.icecreams.Any())
     {
+        if (RecommendedItem != null)
+        {
+            <h2> Recommended </h2>
 
-        @foreach (var catalogItem in catalog.icecreams)
+            <MudCard>
+                <img src="@RecommendedItem.ImageUrl" height="100"/>
+                
+                <MudCardContent>
+                    <MudText Typo="Typo.h5">@RecommendedItem.Name</MudText>
+                    <MudText Typo="Typo.body2">@RecommendedItem.Description</MudText>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Style="align-self:center" @onclick="()=> PreOrderIceCreamAsync(RecommendedItem.Id)">Pre-Order</MudButton>
+                </MudCardActions>
+            </MudCard>
+        }
+
+        <h2> Store </h2>
+
+        @foreach (var catalogItem in Catalog.icecreams)
         {
             <MudCard>
-                <MudCardMedia Height="100" Image="@catalogItem.ImageUrl" />
+                <img src="@catalogItem.ImageUrl" height="100" />
                 <MudCardContent>
                     <MudText Typo="Typo.h5">@catalogItem.Name</MudText>
                     <MudText Typo="Typo.body2">@catalogItem.Description</MudText>
                 </MudCardContent>
                 <MudCardActions>
-                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Style="align-self:center" @onclick="()=> PreOrderIceCream(catalogItem.Id)">Pre-Order</MudButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Style="align-self:center" @onclick="()=> PreOrderIceCreamAsync(catalogItem.Id)">Pre-Order</MudButton>
                 </MudCardActions>
             </MudCard>
         }
@@ -37,65 +55,98 @@
 
     }
 
-        <h5 style="color:red">
-            @ErrorMessage
-        </h5>
+    <h5 style="color:red">
+        @ErrorMessage
+    </h5>
 
-        <h5 style="color:green">
-            @SuccessMessage
-        </h5>
+    <h5 style="color:green">
+        @SuccessMessage
+    </h5>
 
 </div>
 @code {
-    private Catalog catalog;
+    private Catalog Catalog;
     private string ErrorMessage = "";
     private string SuccessMessage = "";
+    private CatalogItem RecommendedItem;
+    private string PersonalizerEventId;
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            catalog = await Http.GetFromJsonAsync<Catalog>("/api/CatalogItems");
-
+            Catalog = await Http.GetFromJsonAsync<Catalog>("/api/CatalogItems");
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex.ToString());
-            ErrorMessage = $"An error happened when retrieving the catalog {ex.Message}";
+            ErrorMessage = $"An error happened when retrieving the catalog: {ex.Message}";
+        }
+        await GetRecommended();
+    }
+
+    private async Task GetRecommended()
+    {
+        try
+        {
+            var user = await GetUserAsync();
+            var recommendationRequest = new RecommendationRequest
+            {
+                Catalogitems = Catalog.icecreams,
+                UserName = user.UserDetails
+            };
+
+            var response= await Http.PostAsJsonAsync("/api/Recommendation", recommendationRequest);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                ErrorMessage = "The preorder was not successfull";
+            }
+            else
+            {
+                var recommendedResponse = await response.Content.ReadFromJsonAsync<RecommendationResponse>();
+                RecommendedItem = Catalog.icecreams.FirstOrDefault(x => x.Id == recommendedResponse.PrefferedItemId);
+                PersonalizerEventId = recommendedResponse.eventId;
+                this.StateHasChanged();
+            }
+        }
+        catch(Exception ex)
+        {
+            Console.WriteLine(ex.ToString());
+            ErrorMessage = $"An error happened when retrieving recommened item: {ex.Message}";
         }
     }
 
-    private async Task PreOrderIceCream(int icecreamId)
+    private async Task PreOrderIceCreamAsync(int icecreamId)
     {
 
         try
         {
-            var user = await JS.InvokeAsync<ClientPrincipal>("getUserInfo");
-
-            if (HostEnvironment.IsDevelopment())
-            {
-                user = new ClientPrincipal
-                {
-                    UserDetails = "TestUser"
-                };
-            }
+            var user = await GetUserAsync();
             ErrorMessage = "";
             SuccessMessage = "";
-
-
 
             if (user != null)
             {
                 Console.WriteLine($"user:  {user.UserDetails}, icecreamid:{icecreamId}");
                 var preOrder = new Preorder(user.UserDetails, icecreamId);
-                var response = await Http.PostAsJsonAsync("/api/SendIceCreamOrders", preOrder);
+
+                var request = new SendIceCreamOrderRequest
+                {
+                    Preorder = preOrder,
+                    IsRecommended = RecommendedItem.Id == icecreamId,
+                    EventId = PersonalizerEventId
+
+                };
+
+                var response = await Http.PostAsJsonAsync("/api/SendIceCreamOrders", request);
                 if (!response.IsSuccessStatusCode)
                 {
                     ErrorMessage = "The preorder was not successfull";
                 }
                 else
                 {
-                    SuccessMessage = $"Preorder of {catalog.icecreams.FirstOrDefault(x=>x.Id== icecreamId).Name} has been sent";
+                    SuccessMessage = $"Preorder of {Catalog.icecreams.FirstOrDefault(x=>x.Id== icecreamId).Name} has been sent";
                 }
             }
             else
@@ -109,5 +160,21 @@
             Console.WriteLine(ex.ToString());
             ErrorMessage = $"An error happened when preordering the icecream: {ex.Message}";
         }
+
+        await GetRecommended();
+    }
+
+    private async Task<ClientPrincipal> GetUserAsync()
+    {
+        var user = await JS.InvokeAsync<ClientPrincipal>("getUserInfo");
+
+        if (HostEnvironment.IsDevelopment())
+        {
+            user = new ClientPrincipal
+            {
+                UserDetails = "TestUser"
+            };
+        }
+        return user;
     }
 }

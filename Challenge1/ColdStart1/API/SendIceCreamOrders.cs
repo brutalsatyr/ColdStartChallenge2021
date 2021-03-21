@@ -7,6 +7,8 @@ using Azure.Storage.Queues;
 using ColdStart1App.Shared;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.CognitiveServices.Personalizer;
+using Microsoft.Azure.CognitiveServices.Personalizer.Models;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
@@ -33,22 +35,32 @@ namespace API
                     requestBody = await sReader.ReadToEndAsync();
                 }
 
-                //var connectionString = Environment.GetEnvironmentVariable("AzureQueueStorage", EnvironmentVariableTarget.Process);
-                //var queueClient = new QueueClient(connectionString, QueueName);
-                //await queueClient.SendMessageAsync(requestBody);
-                ////Send to AzureQueue Storage
-                //Console.WriteLine(requestBody);
-
-                var preorder = JsonConvert.DeserializeObject<Preorder>(requestBody);
+                var sendIceCreamOrderRequest = JsonConvert.DeserializeObject<SendIceCreamOrderRequest>(requestBody);
 
                 var contextOptions = new DbContextOptionsBuilder<ColdStartContext>()
                     .UseSqlServer(Environment.GetEnvironmentVariable("AzureSqlDatabase", EnvironmentVariableTarget.Process))
                     .Options;
                 using (var context = new ColdStartContext(contextOptions))
                 {
-                    await context.Orders.AddAsync(preorder);
+                    await context.Orders.AddAsync(sendIceCreamOrderRequest.Preorder);
                     await context.SaveChangesAsync();
                 }
+
+
+                var personalizerEndpoint = Environment.GetEnvironmentVariable("AzurePersonalizerEndpoint", EnvironmentVariableTarget.Process);
+                var personalizerKey = Environment.GetEnvironmentVariable("AzurePersonalizerKey", EnvironmentVariableTarget.Process);
+                if (!string.IsNullOrWhiteSpace(personalizerEndpoint) || !string.IsNullOrWhiteSpace(personalizerKey))
+                {
+                    var personalizerClient = new PersonalizerClient(
+                        new ApiKeyServiceClientCredentials(personalizerKey))
+                    {
+                        Endpoint = personalizerEndpoint
+                    };
+
+                    var request = new RewardRequest(sendIceCreamOrderRequest.IsRecommended ? 1 : 0);
+                    await personalizerClient.RewardAsync(sendIceCreamOrderRequest.EventId, request);      
+                }
+
 
                 return new OkObjectResult(true);
             }
