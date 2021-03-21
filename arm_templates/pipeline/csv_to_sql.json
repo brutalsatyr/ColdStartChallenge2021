@@ -1,9 +1,9 @@
 {
-	"name": "csv_to_sql_server",
+	"name": "csv_to_sql",
 	"properties": {
 		"activities": [
 			{
-				"name": "Copy_paq",
+				"name": "Copy_z9e",
 				"type": "Copy",
 				"dependsOn": [],
 				"policy": {
@@ -40,6 +40,7 @@
 						"type": "SqlServerSink"
 					},
 					"enableStaging": false,
+					"enableSkipIncompatibleRow": true,
 					"validateDataConsistency": false,
 					"translator": {
 						"type": "TabularTranslator",
@@ -102,20 +103,18 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "SourceDataset_paq",
+						"referenceName": "SourceDataset_z9e",
 						"type": "DatasetReference"
 					}
 				],
 				"outputs": [
 					{
-						"referenceName": "DestinationDataset_paq",
+						"referenceName": "DestinationDataset_z9e",
 						"type": "DatasetReference"
 					}
 				]
 			}
 		],
-		"annotations": [],
-		"lastPublishTime": "2021-03-16T20:58:05Z"
-	},
-	"type": "Microsoft.DataFactory/factories/pipelines"
+		"annotations": []
+	}
 }

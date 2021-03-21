@@ -1,5 +1,5 @@
 {
-	"name": "SourceDataset_paq",
+	"name": "SourceDataset_z9e",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "coldstartbloblink",
@@ -37,6 +37,5 @@
 				"type": "String"
 			}
 		]
-	},
-	"type": "Microsoft.DataFactory/factories/datasets"
+	}
 }
