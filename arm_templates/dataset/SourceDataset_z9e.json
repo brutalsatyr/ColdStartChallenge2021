@@ -1,0 +1,41 @@
+{
+	"name": "SourceDataset_z9e",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "coldstartbloblink",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "coldstart-orders-historical.csv",
+				"folderPath": "data",
+				"container": "coldstartblob"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "User",
+				"type": "String"
+			},
+			{
+				"name": "Date",
+				"type": "String"
+			},
+			{
+				"name": "Id",
+				"type": "String"
+			},
+			{
+				"name": "IcecreamId",
+				"type": "String"
+			}
+		]
+	}
+}
