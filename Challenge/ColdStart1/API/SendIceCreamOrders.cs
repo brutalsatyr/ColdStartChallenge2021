@@ -28,13 +28,13 @@ namespace API
         {
             try
             {
-
                 string requestBody = String.Empty;
                 using (StreamReader sReader = new StreamReader(req.Body))
                 {
                     requestBody = await sReader.ReadToEndAsync();
                 }
 
+                //Send to SQL db
                 var sendIceCreamOrderRequest = JsonConvert.DeserializeObject<SendIceCreamOrderRequest>(requestBody);
 
                 var contextOptions = new DbContextOptionsBuilder<ColdStartContext>()
@@ -42,11 +42,17 @@ namespace API
                     .Options;
                 using (var context = new ColdStartContext(contextOptions))
                 {
-                    await context.Orders.AddAsync(sendIceCreamOrderRequest.Preorder);
+                    var preorder= await context.Orders.AddAsync(sendIceCreamOrderRequest.Preorder);
                     await context.SaveChangesAsync();
+
+                    //Send to Azure Queuee
+                    var storageConnectionString = Environment.GetEnvironmentVariable("AzureQueueStorage", EnvironmentVariableTarget.Process);
+                    var queueClient = new QueueClient(storageConnectionString, QueueName);
+                    var preOrderBytes = System.Text.Encoding.UTF8.GetBytes(preorder.Entity.toJson());
+                    await queueClient.SendMessageAsync(Convert.ToBase64String(preOrderBytes));
                 }
 
-
+                //Send personalizer options
                 var personalizerEndpoint = Environment.GetEnvironmentVariable("AzurePersonalizerEndpoint", EnvironmentVariableTarget.Process);
                 var personalizerKey = Environment.GetEnvironmentVariable("AzurePersonalizerKey", EnvironmentVariableTarget.Process);
                 if (!string.IsNullOrWhiteSpace(personalizerEndpoint) || !string.IsNullOrWhiteSpace(personalizerKey))
