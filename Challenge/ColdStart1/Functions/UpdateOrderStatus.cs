@@ -12,7 +12,7 @@ namespace Functions
     public class UpdateOrderStatus
     {
         [FunctionName("UpdateOrderStatus")]
-        public static async Task RunAsync([TimerTrigger("0 0 0 */1 * *", RunOnStartup = true)] TimerInfo myTimer, ILogger log)
+        public static async Task RunAsync([TimerTrigger("0 0 0 */1 * *")] TimerInfo myTimer, ILogger log)
         {
             var cosmosConnectionstring = Environment.GetEnvironmentVariable("CosmosDBConnection", EnvironmentVariableTarget.Process);
             using (CosmosClient cosmosClient = new CosmosClient(cosmosConnectionstring))
