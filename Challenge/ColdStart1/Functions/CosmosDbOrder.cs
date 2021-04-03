@@ -5,13 +5,17 @@ namespace Functions
 {
     public class CosmosDbOrder
     {
+        public CosmosDbOrder()
+        {
+
+        }
 
         public CosmosDbOrder(Preorder preOrder, CatalogItem iceCream)
         {
-            Id = preOrder.Id;
+            id = preOrder.Id;
             User = preOrder.User;
             Date = preOrder.Date;
-            Status = "Accepted";
+            Status = preOrder.Status;
             FullAddress = preOrder.FullAddress;
             LastPosition = null;
             DeliveryPosition = null;
@@ -25,7 +29,7 @@ namespace Functions
             Driver = new CosmosDriver();
         }
 
-        public Guid Id { get; set; }
+        public Guid id { get; set; }
         public string User { get; set; }
         public DateTime Date { get; set; }
         public string Status { get; set; }
