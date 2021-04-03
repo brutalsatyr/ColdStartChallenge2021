@@ -25,7 +25,7 @@ jobs:
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
     - name: Clean
-      run: dotnet clean ./Bumbo-Web/Bumbo-Web.sln --configuration Release && dotnet nuget locals all --clear
+      run: dotnet clean ./Challenge/ColdStart1/Functions/Functions.csproj --configuration Release && dotnet nuget locals all --clear
     - name: 'Resolve Project Dependencies Using Dotnet'
       shell: pwsh
       run: |
